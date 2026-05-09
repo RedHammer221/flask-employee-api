@@ -27,6 +27,15 @@ def get_employees():
 
 
 # CREATE EMPLOYEE
+existing_employee = Employee.query.filter_by(
+    email=data['email']
+).first()
+
+if existing_employee:
+    return jsonify({
+        "error": "Email already exists"
+    }), 400
+    
 @employee_bp.route('/employees', methods=['POST'])
 def create_employee():
 
