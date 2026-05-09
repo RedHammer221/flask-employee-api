@@ -68,7 +68,7 @@ def create_employee():
 @employee_bp.route('/employees/<int:employee_id>', methods=['GET'])
 def get_employee(employee_id):
 
-    employee = Employee.query.get(employee_id)
+    employee = db.session.get(Employee, employee_id)
 
     if not employee:
         return jsonify({
