@@ -63,3 +63,22 @@ def create_employee():
     return jsonify({
         "message": "Employee created successfully"
     }), 201
+
+# GET SINGLE EMPLOYEE
+@employee_bp.route('/employees/<int:employee_id>', methods=['GET'])
+def get_employee(employee_id):
+
+    employee = Employee.query.get(employee_id)
+
+    if not employee:
+        return jsonify({
+            "error": "Employee not found"
+        }), 404
+
+    return jsonify({
+        "id": employee.id,
+        "first_name": employee.first_name,
+        "last_name": employee.last_name,
+        "email": employee.email,
+        "department": employee.department
+    })
