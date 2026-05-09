@@ -32,11 +32,19 @@ def create_employee():
 
     data = request.get_json()
 
+    required_fields = ['first_name', 'last_name', 'email']
+
+    for field in required_fields:
+        if field not in data:
+            return jsonify({
+                "error": f"{field} is required"
+            }), 400
+
     new_employee = Employee(
         first_name=data['first_name'],
         last_name=data['last_name'],
         email=data['email'],
-        department=data['department']
+        department=data.get('department')
     )
 
     db.session.add(new_employee)
