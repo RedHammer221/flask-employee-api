@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify, request
-
+from flask import Blueprint, jsonify, request, current_app
 from app import db
 from app.models.employee import Employee
+from werkzeug.utils import secure_filename
+import os
 
 employee_bp = Blueprint('employee_bp', __name__)
 
@@ -139,4 +140,53 @@ def update_employee(employee_id):
 
     return jsonify({
         "message": "Employee updated successfully"
+    })
+
+# UPLOAD EMPLOYEE IMAGE
+@employee_bp.route(
+    '/employees/<int:employee_id>/upload',
+    methods=['POST']
+)
+def upload_employee_image(employee_id):
+
+    employee = db.session.get(Employee, employee_id)
+
+    if not employee:
+        return jsonify({
+            "error": "Employee not found"
+        }), 404
+
+    if 'image' not in request.files:
+        return jsonify({
+            "error": "No image file provided"
+        }), 400
+
+    file = request.files['image']
+
+    if file.filename == '':
+        return jsonify({
+            "error": "No selected file"
+        }), 400
+
+    if not allowed_file(file.filename):
+        return jsonify({
+            "error": "Invalid file type"
+        }), 400
+
+    filename = secure_filename(file.filename)
+
+    filepath = os.path.join(
+        current_app.config['UPLOAD_FOLDER'],
+        filename
+    )
+
+    file.save(filepath)
+
+    employee.profile_image = f"uploads/{filename}"
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Image uploaded successfully",
+        "image_path": employee.profile_image
     })
