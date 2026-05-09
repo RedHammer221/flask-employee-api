@@ -82,3 +82,61 @@ def get_employee(employee_id):
         "email": employee.email,
         "department": employee.department
     })
+
+# DELETE EMPLOYEE
+@employee_bp.route('/employees/<int:employee_id>', methods=['DELETE'])
+def delete_employee(employee_id):
+
+    employee = db.session.get(Employee, employee_id)
+
+    if not employee:
+        return jsonify({
+            "error": "Employee not found"
+        }), 404
+
+    db.session.delete(employee)
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Employee deleted successfully"
+    })
+
+# UPDATE EMPLOYEE
+@employee_bp.route('/employees/<int:employee_id>', methods=['PUT'])
+def update_employee(employee_id):
+
+    employee = db.session.get(Employee, employee_id)
+
+    if not employee:
+        return jsonify({
+            "error": "Employee not found"
+        }), 404
+
+    data = request.get_json()
+
+    employee.first_name = data.get(
+        'first_name',
+        employee.first_name
+    )
+
+    employee.last_name = data.get(
+        'last_name',
+        employee.last_name
+    )
+
+    employee.email = data.get(
+        'email',
+        employee.email
+    )
+
+    employee.department = data.get(
+        'department',
+        employee.department
+    )
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Employee updated successfully"
+    })
